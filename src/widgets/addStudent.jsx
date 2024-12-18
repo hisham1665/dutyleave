@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../firebase/cofig"; // Import Firestore instance
-
+import React, { useState} from "react";
+import { fetchStudentDetailsBySrNumber } from "../firebase/Suggestion"; // Import Firebase operations
+import { addDoc,collection } from "firebase/firestore";
+import { db } from "../firebase/cofig"; // Import Firebase config
 const FormToTable = (props) => {
-    const data = props.formData
-  // State to hold input form values
+  const data = props.formData; // Get dynamic data from parent
+  
   const [formData, setFormData] = useState({
     Sr_Number: "",
     Name: "",
@@ -13,19 +13,44 @@ const FormToTable = (props) => {
     Rollno: ""
   });
 
-  // State to hold table rows
   const [rows, setRows] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // If SR number is entered, fetch matching data from Firestore
+    if (name === "Sr_Number" && value) {
+      fetchSuggestions(value);
+    } else {
+      setSuggestions([]); // Clear suggestions when SR number is empty
+    }
+  };
+
+  // Fetch suggestions from Firestore based on SR Number
+  const fetchSuggestions = async (srNumber) => {
+    const fetchedSuggestions = await fetchStudentDetailsBySrNumber(srNumber);
+    setSuggestions(fetchedSuggestions.slice(0,5)); // Update state with fetched suggestions
+  };
+
+  // Handle selecting a suggestion to auto-fill the form
+  const handleSelectSuggestion = (suggestion) => {
+    setFormData({
+      Sr_Number: suggestion.SR,
+      Name: suggestion.Name,
+      Sem: suggestion.Sem,
+      Class_Div: suggestion.Class,
+      Rollno: suggestion.RollNo
+    });
+
+    setSuggestions([]); // Clear suggestions after selection
   };
 
   // Add row to table and clear form fields
   const handleAdd = (e) => {
     e.preventDefault();
-    // Check if all fields are filled
     if (
       formData.Sr_Number &&
       formData.Name &&
@@ -57,7 +82,7 @@ const FormToTable = (props) => {
       // Add rows array as a single document in Firestore
       const docRef = await addDoc(collection(db, "Application"), {
         tableData: rows,
-        data: data,
+        data: data, // Sending data from parent
         timestamp: new Date(),
       });
       console.log("Document written with ID: ", docRef.id);
@@ -65,7 +90,6 @@ const FormToTable = (props) => {
 
       // Clear table after submission
       setRows([]);
-      window.location.reload()
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error submitting data to Firestore!");
@@ -73,27 +97,17 @@ const FormToTable = (props) => {
   };
 
   return (
-    <div className="p-4 place-items-center ">
+    <div className="p-4 place-items-center">
       <h1 className="text-2xl font-bold mb-4">Students List</h1>
 
       {/* Form Section */}
       <form onSubmit={handleAdd} className="grid grid-cols-1 gap-5 mb-4">
         <div className="grid grid-cols-5 gap-4">
-          <label className="block mb-1 text-md font-medium text-gray-900">
-            SR NO*
-          </label>
-          <label className="block mb-1 text-md font-medium text-gray-900">
-            Name*
-          </label>
-          <label className="block mb-1 text-md font-medium text-gray-900">
-            Semester*
-          </label>
-          <label className="block mb-1 text-md font-medium text-gray-900">
-            Class*
-          </label>
-          <label className="block mb-1 text-md font-medium text-gray-900">
-            Roll NO*
-          </label>
+          <label className="block mb-1 text-md font-medium text-gray-900">SR NO*</label>
+          <label className="block mb-1 text-md font-medium text-gray-900">Name*</label>
+          <label className="block mb-1 text-md font-medium text-gray-900">Semester*</label>
+          <label className="block mb-1 text-md font-medium text-gray-900">Class*</label>
+          <label className="block mb-1 text-md font-medium text-gray-900">Roll NO*</label>
         </div>
         <div className="grid grid-cols-5 gap-4">
           <input
@@ -102,7 +116,7 @@ const FormToTable = (props) => {
             value={formData.Sr_Number}
             onChange={handleChange}
             placeholder="SR"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-1.5 "
+            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
           />
           <input
             type="text"
@@ -110,7 +124,7 @@ const FormToTable = (props) => {
             value={formData.Name}
             onChange={handleChange}
             placeholder="Name"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-1.5 "
+            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
           />
           <input
             type="text"
@@ -118,7 +132,7 @@ const FormToTable = (props) => {
             value={formData.Sem}
             onChange={handleChange}
             placeholder="Semester"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-1.5 "
+            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
           />
           <input
             type="text"
@@ -126,7 +140,7 @@ const FormToTable = (props) => {
             value={formData.Class_Div}
             onChange={handleChange}
             placeholder="Class"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-1.5 "
+            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
           />
           <input
             type="number"
@@ -134,9 +148,27 @@ const FormToTable = (props) => {
             value={formData.Rollno}
             onChange={handleChange}
             placeholder="Roll NO"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-1.5 "
+            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
           />
         </div>
+
+        {/* Suggestions dropdown */}
+        {suggestions.length > 0 && (
+          <div className="mt-2">
+            <ul className="border border-gray-300 rounded-lg bg-white">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                >
+                  {suggestion.Name} - {suggestion.Sem} - {suggestion.Class}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
@@ -152,7 +184,7 @@ const FormToTable = (props) => {
             <th className="border p-2 bg-red-500 w-40">SR NO</th>
             <th className="border p-2 bg-red-500 w-64">Name</th>
             <th className="border p-2 bg-red-500 w-16">Semester</th>
-            <th className="border p-2 bg-red-500 w-16 " >Class</th>
+            <th className="border p-2 bg-red-500 w-16">Class</th>
             <th className="border p-2 bg-red-500 w-16">Roll NO</th>
           </tr>
         </thead>
@@ -167,20 +199,12 @@ const FormToTable = (props) => {
               <td className="border p-2">{row.Rollno}</td>
             </tr>
           ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan="4" className="border p-2 text-center text-gray-500">
-                No data available
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
 
-      {/* Submit Button */}
       <button
+        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
         onClick={handleSubmitToFirestore}
-        className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mt-4"
       >
         Submit to Firestore
       </button>

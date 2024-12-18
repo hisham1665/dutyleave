@@ -1,128 +1,40 @@
-import React, { useState } from 'react';
-import FormToTable from '../widgets/addStudent';
-
+import React from 'react'
+import Header from "../widgets/Header";
+import Cards from '../widgets/Cards';
+import {  useNavigate } from 'react-router-dom';
 function StudentPage() {
-    // State to hold all the form input values
-    const [formData, setFormData] = useState({
-        eventName: '',
-        date: '',
-        fromHour: '',
-        toHour: '',
-        facultyName: '',
-        facultyId: '',
-        eventDescription: '',
-    });
-
-    // Handle input changes dynamically
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    return (
+    const navigate = useNavigate();
+    const handleNewApplication = () => {
+        navigate('/dutyLeaveApplication');
+    }
+  return (
+    <div>
         <div>
-            <div className='font-bold text-4xl place-items-center mt-8'>
-                <h1>Duty Leave Application Form</h1>
-            </div>
-            <div>
-                <form className="flex flex-col space-y-4 p-4 max-w-lg mx-auto">
-                    <div className="flex flex-col space-y-4 p-4 mb-3">
-                        <label className='block mb-1 text-md font-medium text-gray-900'>Event Name*</label>
-                        <input
-                            type='text'
-                            name='eventName'
-                            className='shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5'
-                            required
-                            value={formData.eventName}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="grid md:grid-cols-3 md:gap-6">
-                        <div className="relative z-0 w-full mb-5 group">
-                            <label htmlFor="date" className="block mb-1 text-md font-medium text-gray-900">Date*</label>
-                            <input
-                                type="date"
-                                name="date"
-                                id="date"
-                                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                                required
-                                value={formData.date}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="relative z-0 w-full mb-5 group">
-                            <label htmlFor="fromHour" className="block mb-1 text-md font-medium text-gray-900">From Hour*</label>
-                            <input
-                                type="number"
-                                name="fromHour"
-                                id="fromHour"
-                                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 w-20"
-                                required
-                                value={formData.fromHour}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="relative z-0 w-full mb-5 group">
-                            <label htmlFor="toHour" className="block mb-1 text-md font-medium text-gray-900">To Hour*</label>
-                            <input
-                                type="number"
-                                name="toHour"
-                                id="toHour"
-                                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 w-20"
-                                required
-                                value={formData.toHour}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 md:gap-8">
-                        <div className="relative z-0 w-full mb-5 group">
-                            <label htmlFor="facultyName" className="block mb-1 text-md font-medium text-gray-900">Consulting Faculty Name*</label>
-                            <input
-                                type="text"
-                                name="facultyName"
-                                id="facultyName"
-                                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                                required
-                                value={formData.facultyName}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="relative z-0 w-full mb-5 group">
-                            <label htmlFor="facultyId" className="block mb-1 text-md font-medium text-gray-900">Fac ID*</label>
-                            <input
-                                type="text"
-                                name="facultyId"
-                                id="facultyId"
-                                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 w-20"
-                                required
-                                value={formData.facultyId}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-                    <div className='relative z-0 w-full mb-5'>
-                        <label htmlFor="eventDescription" className="block mb-1 text-md font-medium text-gray-900">Briefly Describe The Event*</label>
-                        <textarea
-                            id="eventDescription"
-                            rows="4"
-                            name='eventDescription'
-                            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                            value={formData.eventDescription}
-                            onChange={handleChange}
-                        ></textarea>
-                    </div>
-                </form>
-            </div>
-            <div>
-                <FormToTable formData={formData} />
+            <Header/>
+        </div>
+        <div>
+            <div className='grid grid-cols-2 bg-slate-900 text-white p-4 '>
+                <div className='place-items-start mt-3'>
+                    <div><h5>change password</h5></div>
+                    <div><h5>Logout</h5></div>
+                </div>
+                <div className='flex justify-end '>
+                    <button onClick={handleNewApplication} className='sm:mt-7 focus:outline-none text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm min-w-fit me-10 p-2.5'> 
+                        <h1 className='lg:text-lg text-sm font-semibold sm:text-sm'> New Application </h1>
+                    </button>   
+                </div>
             </div>
         </div>
-    );
+        <div className='w-full '>
+            <div className=' mt-5 mx-5 place-items-center '>
+                <h1 className='text-gray-900 text-2xl md:text-3xl font-semibold'>Your Duty Leave Application Status</h1>
+            </div>
+        </div>
+        <div className='m-4 pt-4'>
+                <Cards/>
+        </div>
+    </div>
+  )
 }
 
-export default StudentPage;
+export default StudentPage
